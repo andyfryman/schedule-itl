@@ -18,20 +18,24 @@ const server = new Hapi.Server(
 );
 
 (async () => {
-  if (!process.env.POSTGRES_HOST) {
-    throw Error(
-      "process.env.POSTGRES_HOST must be a: user:pass@ipService:port ",
-    );
-  }
-  const sequelize = new Sequelize(
-    `postgres://${process.env.POSTGRES_HOST}/${process.env.POSTGRES_DB || "heroes"}`,
-    {
-      ssl: process.env.POSTGRES_SSL,
-      dialectOptions: {
+
+  var dev = process.env.POSTGRES_HOST;
+  var sequelize;
+
+  if (dev) {
+    sequelize = new Sequelize(
+      `postgres://${process.env.POSTGRES_HOST}/${process.env.POSTGRES_DB || "heroes"}`,
+      {
         ssl: process.env.POSTGRES_SSL,
-      },
-    }
-  );
+        dialectOptions: {
+          ssl: process.env.POSTGRES_SSL,
+        },
+      }
+    );
+  } else {
+    sequelize = new Sequelize(process.env.DATABASE_URL);
+  }
+
   await sequelize.authenticate();
   console.log("postgres is running");
 
