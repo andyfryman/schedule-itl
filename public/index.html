@@ -1,0 +1,153 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <style>
+    </style>
+
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/css/bootstrap.min.css"
+        integrity="sha384-Vkoo8x4CGsO3+Hhxv8T/Q5PaXtkKtu6ug5TOeNV6gBiFeWPGFN9MuhOf23Q9Ifjh" crossorigin="anonymous">
+
+    <script src="https://code.jquery.com/jquery-3.4.1.min.js"
+        integrity="sha256-CSXorXvZcTkaix6Yvo6HppcZGetbYMGWSFlBw8HfCJo=" crossorigin="anonymous"></script>
+    <script src="https://cdn.jsdelivr.net/npm/popper.js@1.16.0/dist/umd/popper.min.js"
+        integrity="sha384-Q6E9RHvbIyZFJoft+2mJbHaEWldlvI9IOYy5n3zV9zzTtmI3UksdQRVvoxMfooAo"
+        crossorigin="anonymous"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/js/bootstrap.min.js"
+        integrity="sha384-wfSDF2E50Y2D1uUdj0O3uMBJnjuUD4Ih7YwaYd1iqfktj0Uod8GCExl3Og8ifwB6"
+        crossorigin="anonymous"></script>
+
+    <script src="https://unpkg.com/axios/dist/axios.min.js"></script>
+
+    <script src="https://unpkg.com/vue@2.6.8"></script>
+
+</head>
+
+<body>
+
+    <div id="app" class="container">
+        <h1>Client</h1>
+        <h3>Active Courses</h3>
+        <table class="table table-hover">
+            <thead>
+                <tr>
+                    <th scope="col">#</th>
+                    <th scope="col">Name</th>
+                    <th scope="col">Start</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr v-for="(item, index) in courses">
+                    <th scope="row">{{ index + 1 }}</th>
+                    <td>{{ item.name }}</td>
+                    <td>{{ item.start }}</td>
+                </tr>
+            </tbody>
+        </table>
+        <div class="row">
+            <div class="col">
+                <button type="button" class="btn btn-primary" data-toggle="modal"
+                    data-target="#exampleModal">Register</button>
+            </div>
+        </div>
+        <div class="modal fade" id="exampleModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel"
+            aria-hidden="true">
+            <div class="modal-dialog" role="document">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="exampleModalLabel">Register</h5>
+                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                            <span aria-hidden="true">&times;</span>
+                        </button>
+                    </div>
+                    <div class="modal-body">
+                        <form>
+                            <div class="form-group">
+                                <label for="requestCourse">Course</label>
+                                <select class="form-control" id="requestCourse">
+                                    <option v-for="(item, index) in courses" v-bind:value="item.id">
+                                        {{ item.name }}
+                                    </option>
+                                </select>
+                            </div>
+                            <div class="form-group">
+                                <label for="requestName">Name</label>
+                                <input type="text" class="form-control" id="requestName">
+                            </div>
+                            <div class="form-group">
+                                <label for="requestEmail">Email</label>
+                                <input type="email" class="form-control" id="requestEmail">
+                            </div>
+                            <div class="form-group">
+                                <label for="requestPhone">Phone</label>
+                                <input type="tel" class="form-control" id="requestPhone">
+                            </div>
+                        </form>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                        <button id="requestRegister" type="submit" class="btn btn-primary">Register</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        var demo = [
+            {
+                "id": 3,
+                "name": "first",
+                "start": "2020-03-17",
+                "capacity": 1,
+                "createdAt": "2020-02-13T01:01:49.326Z",
+                "updatedAt": "2020-02-13T01:01:49.326Z"
+            },
+            {
+                "id": 5,
+                "name": "second",
+                "start": "2020-02-17",
+                "capacity": 1,
+                "createdAt": "2020-02-13T10:05:24.006Z",
+                "updatedAt": "2020-02-13T10:05:24.006Z"
+            }
+        ];
+        /* Vue-way */
+        new Vue({
+            el: '#app',
+            data() {
+                return {
+                    courses: [],
+                }
+            },
+            mounted() {
+                axios
+                    .get('/course/active')
+                    .then(response => (this.courses = response.data));
+
+                //this.courses = demo;
+            }
+        });
+        /* jQuery-way */
+        $('#requestRegister').on('click', function () {
+            var model = {
+                name: $("#requestName").val(),
+                email: $("#requestEmail").val(),
+                phone: $("#requestPhone").val(),
+                courseId: $("#requestCourse").val(),
+            };
+            $.ajax("/course/{id}/request", {
+                data: JSON.stringify(model),
+                contentType: 'application/json',
+                type: 'POST',
+                success: function () {
+                    $('#exampleModal').modal('hide');
+                    location.reload();
+                }
+            });
+        });
+    </script>
+
+</body>
+
+</html>
